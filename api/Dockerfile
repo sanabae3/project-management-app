@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Copy .env file explicitly (important for runtime)
-COPY .env /app/.env
+#COPY .env /app/.env
 
 # Ensure pip is up to date
 RUN pip install --upgrade pip
