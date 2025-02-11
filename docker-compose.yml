@@ -7,20 +7,40 @@ services:
       - "${FRONTEND_PORT}:80"
     depends_on:
       - api
+    networks:
+      - project_network
 
   api:
     build: ./api
     ports:
       - "${API_PORT}:5000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy  # ✅ Ensures the database is ready
     env_file:
       - .env
+    networks:
+      - project_network
 
   database:
-    build: ./database
+    image: mysql:8.0  # ✅ Using official MySQL image for stability
+    restart: always
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DATABASE_PASSWORD}
-      MYSQL_DATABASE: ${DATABASE_NAME}
+    env_file:
+      - .env
+    volumes:
+      - mysql_data:/var/lib/mysql  # ✅ Persistent database storage
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+    networks:
+      - project_network
+
+networks:
+  project_network:  # ✅ Isolating containers for better security
+    driver: bridge
+
+volumes:
+  mysql_data:  # ✅ Persistent storage for database

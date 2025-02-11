@@ -1,25 +1,23 @@
 CREATE DATABASE IF NOT EXISTS project_management;
 USE project_management;
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password_hash VARCHAR(255) NOT NULL  -- Increased length for hashed passwords
+    password VARCHAR(255) NOT NULL  -- Increased length for hashed passwords
 );
 
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE projects (
     project_id INT AUTO_INCREMENT PRIMARY KEY,
     project_name VARCHAR(255) NOT NULL,
-    description TEXT,
     created_by INT NOT NULL,
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE CASCADE  -- Ensures projects are deleted if user is removed
 );
 
-CREATE TABLE IF NOT EXISTS tasks (
+CREATE TABLE tasks (
     task_id INT AUTO_INCREMENT PRIMARY KEY,
     task_name VARCHAR(255) NOT NULL,
-    description TEXT,
     project_id INT NOT NULL,
     assigned_to INT,
     status ENUM('Pending', 'In Progress', 'Completed') NOT NULL DEFAULT 'Pending',  -- Ensures status is always set

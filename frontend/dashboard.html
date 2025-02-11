@@ -5,38 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="scripts.js" defer></script>
 </head>
 <body>
     <div class="container">
         <h2>Dashboard</h2>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="hidden">Loading data...</div>
+
+        <!-- Dashboard Stats -->
         <div class="stats">
             <p>Total Users: <span id="totalUsers">0</span></p>
             <p>Total Projects: <span id="totalProjects">0</span></p>
             <p>Total Tasks: <span id="totalTasks">0</span></p>
             <p>Completed Tasks: <span id="completedTasks">0</span></p>
         </div>
+
+        <!-- Error Message -->
+        <p id="errorMessage" class="error-message hidden"></p>
+
         <button onclick="logout()">Logout</button>
     </div>
-
-    <script>
-        function fetchDashboard() {
-            fetch("http://localhost:5000/dashboard")
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById("totalUsers").innerText = data.total_users;
-                    document.getElementById("totalProjects").innerText = data.total_projects;
-                    document.getElementById("totalTasks").innerText = data.total_tasks;
-                    document.getElementById("completedTasks").innerText = data.completed_tasks;
-                })
-                .catch(error => console.error("Error:", error));
-        }
-
-        function logout() {
-            localStorage.removeItem("token");
-            window.location.href = "login.html";
-        }
-
-        fetchDashboard();
-    </script>
 </body>
 </html>

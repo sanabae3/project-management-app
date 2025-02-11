@@ -1,36 +1,124 @@
+/* General Styles */
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Arial', sans-serif;
     background: #f4f4f4;
     text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
+/* Centered Container with Responsive Design */
 .container {
-    width: 50%;
+    width: 90%;
+    max-width: 500px;
     margin: auto;
     background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0px 0px 10px gray;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease-in-out;
 }
 
-input, textarea, button {
+/* Form Inputs */
+input, textarea, select, button {
     display: block;
     width: 100%;
     margin: 10px 0;
-    padding: 10px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
 }
 
+/* Improved Buttons */
 button {
     background: #007bff;
     color: white;
     border: none;
     cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease-in-out, transform 0.2s ease;
 }
 
+/* Button Hover Effect */
 button:hover {
     background: #0056b3;
+    transform: scale(1.05);
 }
 
+/* Disabled Button */
+button:disabled {
+    background: #a0a0a0;
+    cursor: not-allowed;
+}
+
+/* Stats Display */
 .stats p {
     font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Loading Indicator */
+.hidden {
+    display: none;
+}
+
+.loading {
+    font-size: 16px;
+    color: #007bff;
+    font-weight: bold;
+}
+
+/* Error Messages */
+.error-message {
+    color: red;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Success Message */
+.success-message {
+    color: green;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Password Visibility Toggle */
+.password-container {
+    position: relative;
+    width: 100%;
+}
+
+.password-container input {
+    width: 100%;
+    padding-right: 40px; /* Space for toggle button */
+}
+
+.password-container button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 600px) {
+    .container {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    input, textarea, select, button {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .stats p {
+        font-size: 16px;
+    }
 }
