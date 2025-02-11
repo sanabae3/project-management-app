@@ -1,29 +1,28 @@
-# Use Python base image
 FROM python:3.9
 
-# Set working directory
 WORKDIR /app
 
-# Copy application files
 COPY . /app
 
-# Copy .env file explicitly (important for runtime)
-#COPY .env /app/.env
+# Create a non-root user and group
+RUN addgroup -S appuser && adduser -S -G appuser appuser
 
-# Ensure pip is up to date
+# Switch to the non-root user
+USER appuser
+
 RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Install dependencies from requirements.txt
-RUN pip install -r requirements.txt
+RUN flask db init
+COPY migrations /app/migrations
+RUN flask db upgrade
 
-# Make the entrypoint script executable
+COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Expose Flask's API port
 EXPOSE 5000
 
-# Set environment variables from .env (if needed)
 ENV API_PORT=${API_PORT}
+ENV FLASK_DEBUG=1 # Or True
 
-# Run entrypoint script automatically
-ENTRYPOINT ["sh", "/app/entrypoint.sh"]
+CMD ["/app/entrypoint.sh"]

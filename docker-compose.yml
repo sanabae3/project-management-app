@@ -11,7 +11,7 @@ services:
       - .env
     networks:
       - project_network
-    restart: unless-stopped  # ✅ Ensures frontend restarts if it crashes
+    restart: unless-stopped
 
   api:
     build: ./api
@@ -20,11 +20,16 @@ services:
     env_file:
       - .env
     depends_on:
-      database:
-        condition: service_healthy  # ✅ Ensures MySQL is fully ready before API starts
+      - database
     networks:
       - project_network
-    restart: unless-stopped  # ✅ Keeps API running if it crashes
+    restart: unless-stopped
+    healthcheck: # Add healthcheck to API
+      test: ["CMD-SHELL", "python -c 'import requests; requests.get(\"http://localhost:5000/health\", timeout=5)'"] # Replace /health endpoint with a real one
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s # Give the app time to start
 
   database:
     image: mysql:8.0
@@ -34,10 +39,10 @@ services:
     env_file:
       - .env
     volumes:
-      - mysql_data:/var/lib/mysql  # ✅ Persistent database storage
-      - ./database/my.cnf:/etc/mysql/my.cnf  # ✅ Load custom MySQL config
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # ✅ Auto-run SQL script only on first start
-    command: --default-authentication-plugin=mysql_native_password  # ✅ Fix MySQL authentication issues
+      - mysql_data:/var/lib/mysql
+      - ./database/my.cnf:/etc/mysql/my.cnf
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "$DATABASE_USER", "-p$DATABASE_PASSWORD"]
       interval: 10s
@@ -47,7 +52,7 @@ services:
 
 networks:
   project_network:
-    driver: bridge  # ✅ Isolates services for better security
+    driver: bridge
 
 volumes:
-  mysql_data:  # ✅ Persistent MySQL storage
+  mysql_data:
