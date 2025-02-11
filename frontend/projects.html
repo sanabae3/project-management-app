@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Projects & Tasks</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Manage Projects</h2>
+
+        <!-- Create Project -->
+        <form id="projectForm">
+            <input type="text" id="projectName" placeholder="Project Name" required>
+            <textarea id="projectDescription" placeholder="Project Description"></textarea>
+            <button type="submit">Create Project</button>
+        </form>
+
+        <!-- Project List with Assignments -->
+        <h3>Projects</h3>
+        <ul id="projectList"></ul>
+
+        <!-- Task Management -->
+        <h3>Manage Tasks</h3>
+        <form id="taskForm">
+            <select id="taskProject"></select>
+            <input type="text" id="taskName" placeholder="Task Name" required>
+            <textarea id="taskDescription" placeholder="Task Description"></textarea>
+            <select id="taskAssignee"></select>
+            <button type="submit">Create Task</button>
+        </form>
+
+        <!-- Task List -->
+        <h3>Tasks</h3>
+        <ul id="taskList"></ul>
+    </div>
+
+    <script>
+        // Fetch Projects
+        function fetchProjects() {
+            fetch("http://localhost:5000/projects")
+                .then(response => response.json())
+                .then(data => {
+                    const projectList = document.getElementById("projectList");
+                    const taskProject = document.getElementById("taskProject");
+                    projectList.innerHTML = "";
+                    taskProject.innerHTML = "";
+
+                    data.forEach(project => {
+                        // Add project to list
+                        const li = document.createElement("li");
+                        li.innerText = `${project.project_name} - ${project.project_description}`;
+                        projectList.appendChild(li);
+
+                        // Add project to task dropdown
+                        const option = document.createElement("option");
+                        option.value = project.project_id;
+                        option.innerText = project.project_name;
+                        taskProject.appendChild(option);
+                    });
+                });
+        }
+
+        // Fetch Users for Task Assignment
+        function fetchUsers() {
+            fetch("http://localhost:5000/users")
+                .then(response => response.json())
+                .then(data => {
+                    const taskAssignee = document.getElementById("taskAssignee");
+                    taskAssignee.innerHTML = "";
+
+                    data.forEach(user => {
+                        const option = document.createElement("option");
+                        option.value = user.user_id;
+                        option.innerText = user.username;
+                        taskAssignee.appendChild(option);
+                    });
+                });
+        }
+
+        // Fetch Tasks
+        function fetchTasks() {
+            fetch("http://localhost:5000/tasks")
+                .then(response => response.json())
+                .then(data => {
+                    const taskList = document.getElementById("taskList");
+                    taskList.innerHTML = "";
+
+                    data.forEach(task => {
+                        const li = document.createElement("li");
+                        li.innerHTML = `
+                            ${task.task_name} - ${task.task_description} 
+                            (Assigned to: ${task.assigned_to}, Status: ${task.status})
+                            <button onclick="updateTaskStatus(${task.task_id})">Mark as Completed</button>
+                        `;
+                        taskList.appendChild(li);
+                    });
+                });
+        }
+
+        // Create Project
+        document.getElementById("projectForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const projectName = document.getElementById("projectName").value;
+            const projectDescription = document.getElementById("projectDescription").value;
+
+            fetch("http://localhost:5000/projects", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ project_name: projectName, project_description: projectDescription })
+            })
+            .then(() => {
+                fetchProjects();
+                document.getElementById("projectForm").reset();
+            });
+        });
+
+        // Create Task
+        document.getElementById("taskForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            const taskName = document.getElementById("taskName").value;
+            const taskDescription = document.getElementById("taskDescription").value;
+            const projectId = document.getElementById("taskProject").value;
+            const assignedTo = document.getElementById("taskAssignee").value;
+
+            fetch("http://localhost:5000/tasks", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ task_name: taskName, task_description: taskDescription, project_id: projectId, assigned_to: assignedTo })
+            })
+            .then(() => {
+                fetchTasks();
+                document.getElementById("taskForm").reset();
+            });
+        });
+
+        // Update Task Status
+        function updateTaskStatus(taskId) {
+            fetch(`http://localhost:5000/tasks/${taskId}/update`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ status: "Completed" })
+            })
+            .then(() => fetchTasks());
+        }
+
+        // Initial Data Load
+        fetchProjects();
+        fetchUsers();
+        fetchTasks();
+    </script>
+</body>
+</html>

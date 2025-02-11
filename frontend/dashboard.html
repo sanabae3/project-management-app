@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Dashboard</h2>
+        <div class="stats">
+            <p>Total Users: <span id="totalUsers">0</span></p>
+            <p>Total Projects: <span id="totalProjects">0</span></p>
+            <p>Total Tasks: <span id="totalTasks">0</span></p>
+            <p>Completed Tasks: <span id="completedTasks">0</span></p>
+        </div>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        function fetchDashboard() {
+            fetch("http://localhost:5000/dashboard")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("totalUsers").innerText = data.total_users;
+                    document.getElementById("totalProjects").innerText = data.total_projects;
+                    document.getElementById("totalTasks").innerText = data.total_tasks;
+                    document.getElementById("completedTasks").innerText = data.completed_tasks;
+                })
+                .catch(error => console.error("Error:", error));
+        }
+
+        function logout() {
+            localStorage.removeItem("token");
+            window.location.href = "login.html";
+        }
+
+        fetchDashboard();
+    </script>
+</body>
+</html>
