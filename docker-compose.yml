@@ -17,22 +17,24 @@ services:
     ports:
       - "${API_PORT}:5000"
     env_file:
-      - .env  # ✅ Load environment variables at runtime
+      - .env
     depends_on:
       database:
-        condition: service_healthy  # ✅ Ensures DB is ready before starting API
+        condition: service_healthy
     networks:
       - project_network
 
   database:
-    image: mysql:8.0  # ✅ Using official MySQL image
+    image: mysql:8.0
     restart: always
     ports:
       - "3306:3306"
     env_file:
-      - .env  # ✅ Loads database credentials from .env
+      - .env
     volumes:
       - mysql_data:/var/lib/mysql  # ✅ Persistent database storage
+      - ./database/my.cnf:/etc/mysql/my.cnf  # ✅ Load custom MySQL config
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # ✅ Auto-run SQL script on first start
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -42,7 +44,7 @@ services:
 
 networks:
   project_network:
-    driver: bridge  # ✅ Isolate services for better security
+    driver: bridge
 
 volumes:
-  mysql_data:  # ✅ Persistent volume for database
+  mysql_data:
