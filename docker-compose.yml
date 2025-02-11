@@ -11,6 +11,7 @@ services:
       - .env
     networks:
       - project_network
+    restart: unless-stopped  # ✅ Ensures frontend restarts if it crashes
 
   api:
     build: ./api
@@ -20,9 +21,10 @@ services:
       - .env
     depends_on:
       database:
-        condition: service_healthy
+        condition: service_healthy  # ✅ Ensures MySQL is fully ready before API starts
     networks:
       - project_network
+    restart: unless-stopped  # ✅ Keeps API running if it crashes
 
   database:
     image: mysql:8.0
@@ -34,9 +36,10 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql  # ✅ Persistent database storage
       - ./database/my.cnf:/etc/mysql/my.cnf  # ✅ Load custom MySQL config
-      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # ✅ Auto-run SQL script on first start
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql  # ✅ Auto-run SQL script only on first start
+    command: --default-authentication-plugin=mysql_native_password  # ✅ Fix MySQL authentication issues
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "$DATABASE_USER", "-p$DATABASE_PASSWORD"]
       interval: 10s
       retries: 5
     networks:
@@ -44,7 +47,7 @@ services:
 
 networks:
   project_network:
-    driver: bridge
+    driver: bridge  # ✅ Isolates services for better security
 
 volumes:
-  mysql_data:
+  mysql_data:  # ✅ Persistent MySQL storage
