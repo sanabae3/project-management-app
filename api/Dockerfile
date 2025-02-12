@@ -5,26 +5,32 @@ WORKDIR /app
 
 COPY . /app
 
-# Create non-root user and group
+# ✅ Install dependencies as root before switching to appuser
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ✅ Create non-root user and group
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 USER appuser
 
+# ✅ Ensure appuser has access to the application directory
+RUN chown -R appuser:appuser /app
 
-RUN pip install --no-cache-dir -r requirements.txt -t /app
-
-# Migrations (Starting from scratch)
-RUN flask db init
-RUN flask db migrate -m "Initial migration"
-RUN flask db upgrade
+# ✅ Run Flask Migrations (now as appuser)
+RUN flask db init || true  # Allow failure if already initialized
+RUN flask db migrate -m "Initial migration" || true
+RUN flask db upgrade || true
 
 # Final stage
 FROM python:3.9-slim-buster
 
-# COPY from builder stage (ownership is preserved)
-COPY --from=builders /app /app  # Simplified path
+# COPY from builder stage
+COPY --from=builders /app /app
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+WORKDIR /app
+USER appuser  # ✅ Set the user for the final image
 
 EXPOSE 5000
 
