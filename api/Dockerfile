@@ -9,7 +9,7 @@ COPY . /app
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 USER appuser
 
-RUN pip install --upgrade pip
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Migrations (Starting from scratch)
