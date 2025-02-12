@@ -33,7 +33,7 @@ COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 WORKDIR /app
-USER appuser  # ✅ Now this user exists in the final image
+
 
 EXPOSE 5000
 
