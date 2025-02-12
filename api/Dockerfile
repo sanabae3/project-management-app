@@ -10,7 +10,7 @@ RUN groupadd -r appuser && useradd -r -g appuser appuser
 USER appuser
 
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt -t /app
 
 # Migrations (Starting from scratch)
 RUN flask db init
