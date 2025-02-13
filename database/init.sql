@@ -31,3 +31,11 @@ CREATE TABLE IF NOT EXISTS tasks (
     FOREIGN KEY (project_id) REFERENCES projects(project_id) ON DELETE CASCADE,
     FOREIGN KEY (assigned_to) REFERENCES users(user_id) ON DELETE SET NULL
 );
+
+-- Insert the initial user (admin user)
+INSERT INTO users (username, email, password_hash)
+VALUES ('admin', 'admin@example.com', 'Peace123#'); -- Replace with the bcrypt hash
+
+-- Or if you are not using bcrypt hash for the initial user. 
+-- INSERT INTO users (username, email, password_hash)
+-- VALUES ('admin', 'admin@example.com', 'admin_password'); -- Replace with a strong and secure password.
