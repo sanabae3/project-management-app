@@ -1,8 +1,24 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required
 from models import db, User, Project, Task
+import bcrypt  # Import bcrypt for password hashing
 
 api_routes = Blueprint("api_routes", __name__)
+
+@api_routes.route("/login", methods=["POST"])
+def login():
+    data = request.json
+    email = data.get("email")
+    password = data.get("password")
+
+    user = User.query.filter_by(email=email).first()
+
+    if user and bcrypt.checkpw(password.encode('utf-8'), user.password_hash.encode('utf-8')): # Verify password
+        access_token = create_access_token(identity=user.id)
+        return jsonify(access_token=access_token), 200
+    else:
+        return jsonify({"error": "Invalid login credentials."}), 401
+    
 
 # ✅ Fetch All Users
 @api_routes.route("/users", methods=["GET"])
@@ -10,14 +26,23 @@ def get_users():
     users = User.query.all()
     return jsonify([{"id": u.id, "username": u.username} for u in users])
 
-# ✅ Create a Project
 @api_routes.route("/projects", methods=["POST"])
+@jwt_required()  # Protect the route - IMPORTANT!
 def create_project():
     data = request.json
-    project = Project(name=data["project_name"], owner_id=data["created_by"])
-    db.session.add(project)
-    db.session.commit()
-    return jsonify({"message": "Project created"}), 201
+    current_user_id = get_jwt_identity()  # Get the logged-in user's ID
+
+    if not data.get("project_name"):  # Validate project name (Important!)
+        return jsonify({"error": "Project name is required"}), 400
+
+    try:  # Add try-except block for better error handling
+        project = Project(name=data["project_name"], owner_id=current_user_id)  # Use logged-in user's ID
+        db.session.add(project)
+        db.session.commit()
+        return jsonify({"message": "Project created", "project_id": project.id}), 201  # Return project ID
+    except Exception as e:  # Catch potential exceptions
+        db.session.rollback()  # Rollback changes in case of error
+        return jsonify({"error": str(e)}), 500  # Return error message and 500 status code
 
 # ✅ Fetch All Tasks
 @api_routes.route("/tasks", methods=["GET"])

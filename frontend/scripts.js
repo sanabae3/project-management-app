@@ -211,3 +211,20 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
+async function loadTasks() {
+    checkAuth();
+    const response = await fetch(`${API_BASE_URL}/tasks`, {
+        headers: { "Authorization": `Bearer ${getToken()}` }
+    });
+    const data = await response.json();
+    const taskList = document.getElementById("taskList"); // Make sure you have this element in your HTML
+
+    taskList.innerHTML = ""; // Clear existing tasks
+
+    data.forEach(task => {
+        const li = document.createElement("li");
+        li.innerHTML = `${task.title} - ${task.status} <button onclick="updateTaskStatus(${task.id})">Complete</button>`; // Add complete button
+        taskList.appendChild(li);
+    });
+}
