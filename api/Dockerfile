@@ -18,30 +18,25 @@ RUN flask db migrate -m "Initial migration" || true
 RUN flask db upgrade || true
 
 
-# Final stage (for running the app)
 FROM python:3.9-slim-buster
 
-# Create the appuser in the final stage
+# Create a non-root user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Copy from builder stage
-COPY --from=builders /app /app
-
-# Switch to the non-root user *before* copying entrypoint.sh
-USER appuser
-
-COPY entrypoint.sh /app/entrypoint.sh
-
-# Change ownership of entrypoint.sh to appuser (Crucial!)
-RUN chown appuser:appuser /app/entrypoint.sh
-
-RUN chmod +x /app/entrypoint.sh
-
-# Set the working directory
+# Set working directory
 WORKDIR /app
 
-# Expose the port (if needed) - should also be in docker-compose
-EXPOSE 5000 
+# Copy and set ownership in one step
+COPY --chown=appuser:appuser entrypoint.sh /app/entrypoint.sh
 
-# Define the ENTRYPOINT (using exec)
+# Ensure the script is executable
+RUN chmod +x /app/entrypoint.sh
+
+# Switch to non-root user
+USER appuser
+
+# Expose the port (if needed)
+EXPOSE 5000
+
+# Define the entrypoint
 ENTRYPOINT ["/app/entrypoint.sh"]
