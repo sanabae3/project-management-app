@@ -12,7 +12,7 @@ COPY requirements.txt /app/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . /app  # Copy the rest of the application code
+COPY . /app 
 
 # Create non-root user and group
 RUN groupadd -r appuser && useradd -r -g appuser appuser
