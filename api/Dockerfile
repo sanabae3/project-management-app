@@ -1,42 +1,43 @@
-# Builder stage (for dependencies and migrations)
+# Builder stage
 FROM python:3.9-slim-buster AS builders
 
 WORKDIR /app
 
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt  # Install as root (OK in builder stage)
 
-COPY . /app  
+COPY . /app
 
 # Create non-root user and group
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Run Flask Migrations (as appuser) - Important: Switch user *before* migrations
+# Run Flask Migrations (as appuser)
 USER appuser
-RUN flask db init || true  # Allow failure if already initialized
+RUN flask db init || true
 RUN flask db migrate -m "Initial migration" || true
 RUN flask db upgrade || true
 
-
+# Final stage
 FROM python:3.9-slim-buster
 
-# Create a non-root user
+# Create the appuser in the final stage (Crucial for permissions)
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Set working directory
-WORKDIR /app
+# Copy installed packages from the builder stage (THIS IS THE KEY CHANGE)
+COPY --from=builders /app/venv /app/venv  # Or /app/.venv if you use a virtual environment
+COPY --from=builders /app/.local /app/.local # Copy any globally installed packages
 
-# Copy and set ownership in one step
-COPY --chown=appuser:appuser entrypoint.sh /app/entrypoint.sh
+# Copy app code
+COPY --from=builders /app /app
 
-# Ensure the script is executable
-RUN chmod +x /app/entrypoint.sh
-
-# Switch to non-root user
 USER appuser
 
-# Expose the port (if needed)
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chown appuser:appuser /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+WORKDIR /app
+
 EXPOSE 5000
 
-# Define the entrypoint
 ENTRYPOINT ["/app/entrypoint.sh"]
