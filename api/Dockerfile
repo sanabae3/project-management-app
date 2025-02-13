@@ -21,7 +21,7 @@ RUN flask db upgrade || true
 # Final stage (for running the app)
 FROM python:3.9-slim-buster
 
-# Create the appuser in the final stage (This is the crucial change)
+# Create the appuser in the final stage
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 # Copy from builder stage
@@ -31,6 +31,10 @@ COPY --from=builders /app /app
 USER appuser
 
 COPY entrypoint.sh /app/entrypoint.sh
+
+# Change ownership of entrypoint.sh to appuser (Crucial!)
+RUN chown appuser:appuser /app/entrypoint.sh
+
 RUN chmod +x /app/entrypoint.sh
 
 # Set the working directory
