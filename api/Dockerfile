@@ -12,7 +12,11 @@ COPY requirements.txt /app/
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . /app 
+# List installed packages (for debugging)
+RUN pip freeze > /app/installed_packages.txt
+COPY installed_packages.txt /app/
+
+COPY . /app  # Copy the rest of the application code
 
 # Create non-root user and group
 RUN groupadd -r appuser && useradd -r -g appuser appuser
@@ -35,8 +39,6 @@ COPY --from=builders /app/.venv /app/.venv
 
 # Copy app code
 COPY --from=builders /app /app
-
-
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chown appuser:appuser /app/entrypoint.sh
