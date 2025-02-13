@@ -36,11 +36,13 @@ COPY --from=builders /app/.venv /app/.venv
 # Copy app code
 COPY --from=builders /app /app
 
-USER appuser
+
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chown appuser:appuser /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
+
+USER appuser
 
 WORKDIR /app
 
