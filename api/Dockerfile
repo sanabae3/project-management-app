@@ -24,8 +24,8 @@ FROM python:3.9-slim-buster
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
 # Copy installed packages from the builder stage (THIS IS THE KEY CHANGE)
-COPY --from=builders /app/venv /app/venv  # Or /app/.venv if you use a virtual environment
-COPY --from=builders /app/.local /app/.local # Copy any globally installed packages
+COPY --from=builders /app/venv /app/venv  
+COPY --from=builders /app/.local /app/.local 
 
 # Copy app code
 COPY --from=builders /app /app
