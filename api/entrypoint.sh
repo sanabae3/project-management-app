@@ -1,13 +1,8 @@
 #!/bin/sh
+# Exit on any error
+set -e
 
-# Run database migrations (if needed) - Better approach
-if flask db upgrade; then
-    echo "Database migrations applied."
-elif [ "$?" -eq 1 ]; then # Check exit code specifically for flask db upgrade
-    echo "Database migrations failed. Check logs."
-    exit 1 # Exit with error code if migrations fail
-else
-    echo "No migrations found or database already up-to-date." # More accurate message
-fi
-
-exec gunicorn --bind 0.0.0.0:$API_PORT --workers 4 --threads 4 app:app
+# Start Flask application using the correct entry point
+exec gunicorn --bind :5000 --workers 1 --threads 4 run:app  # Use Gunicorn in production
+# OR (for development/debugging only)
+# exec python run.py

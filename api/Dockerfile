@@ -1,40 +1,40 @@
-# Multi-stage build
+# Builder stage (for dependencies and migrations)
 FROM python:3.9-slim-buster AS builders
 
 WORKDIR /app
 
-COPY . /app
-
-# ✅ Install dependencies as root before switching to appuser
+COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-# # ✅ Create non-root user and group
-# RUN groupadd -r appuser && useradd -r -g appuser appuser
-# USER appuser
+COPY . /app  
 
-# # ✅ Ensure appuser has access to the application directory
-# RUN chown -R appuser:appuser /app
+# Create non-root user and group
+RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# ✅ Run Flask Migrations (now as appuser)
+# Run Flask Migrations (as appuser) - Important: Switch user *before* migrations
+USER appuser
 RUN flask db init || true  # Allow failure if already initialized
 RUN flask db migrate -m "Initial migration" || true
 RUN flask db upgrade || true
 
-# Final stage
+
+# Final stage (for running the app)
 FROM python:3.9-slim-buster
 
-# COPY from builder stage
+# Copy from builder stage
 COPY --from=builders /app /app
+
+# Switch to the non-root user *before* copying entrypoint.sh
+USER appuser
 
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
+# Set the working directory
 WORKDIR /app
 
+# Expose the port (if needed) - should also be in docker-compose
+EXPOSE 5000 
 
-EXPOSE 5000
-
-ENV API_PORT=${API_PORT}
-ENV FLASK_DEBUG=1
-
-CMD ["/app/entrypoint.sh"]
+# Define the ENTRYPOINT (using exec)
+ENTRYPOINT ["/app/entrypoint.sh"]
