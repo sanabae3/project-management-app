@@ -3,8 +3,12 @@ FROM python:3.9-slim-buster AS builders
 
 WORKDIR /app
 
+# Create and activate the virtual environment (Recommended)
+RUN python3 -m venv .venv
+RUN source .venv/bin/activate
+
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt  # Install as root (OK in builder stage)
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app
 
@@ -23,10 +27,8 @@ FROM python:3.9-slim-buster
 # Create the appuser in the final stage (Crucial for permissions)
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
-# Copy installed packages from the builder stage (THIS IS THE KEY CHANGE)
-COPY --from=builders /app/venv /app/venv  
-COPY --from=builders /app/.local /app/.local 
-
+# Copy the virtual environment (Key change - Copy installed packages)
+COPY --from=builders /app/.venv /app/.venv 
 # Copy app code
 COPY --from=builders /app /app
 
