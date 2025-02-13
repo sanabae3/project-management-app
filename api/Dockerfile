@@ -21,6 +21,9 @@ RUN flask db upgrade || true
 # Final stage (for running the app)
 FROM python:3.9-slim-buster
 
+# Create the appuser in the final stage (This is the crucial change)
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
 # Copy from builder stage
 COPY --from=builders /app /app
 
