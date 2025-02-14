@@ -1,5 +1,5 @@
 // API Base URL
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://api:5000"; // ✅ Use the Docker service name
 
 // Function to check if user is logged in
 function checkAuth() {
