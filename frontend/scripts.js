@@ -1,6 +1,6 @@
 // API Base URL
-const API_BASE_URL = "http://18.224.66.241:5000"; // ✅ Use the Docker service name
-
+//const API_BASE_URL = "http://18.224.66.241:5000"; // ✅ Use the Docker service name
+const API_BASE_URL = "http://api:5000"; // ✅ Use the Docker service name
 // Function to check if user is logged in
 function checkAuth() {
     const token = getToken();
