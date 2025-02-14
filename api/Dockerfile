@@ -15,7 +15,14 @@ RUN python3 -m venv /app/.venv && \
 # Copy the rest of the application code
 COPY . /app
 
-# Set file permissions
+# Run database migrations (as root, within virtual environment) - BEFORE switching user
+RUN python3 -m venv /app/.venv && \
+    . /app/.venv/bin/activate && \
+    flask db init || true && \
+    flask db migrate -m "Initial migration" || true && \
+    flask db upgrade || true
+
+# Set file permissions (AFTER migrations)
 RUN chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
 
 # Switch to non-root user
@@ -24,8 +31,8 @@ USER appuser
 # Expose the application port
 EXPOSE 5000
 
-# Set environment variables for virtual environment activation
-ENV PATH="/app/.venv/bin:$PATH"
+# Set environment variables for virtual environment activation (better in entrypoint.sh)
+# ENV PATH="/app/.venv/bin:$PATH"  # No longer needed here
 
-# Run database migrations at runtime instead of build time
-CMD ["sh", "-c", "flask db upgrade && /app/entrypoint.sh"]
+# Run entrypoint script
+ENTRYPOINT ["/app/entrypoint.sh"]
