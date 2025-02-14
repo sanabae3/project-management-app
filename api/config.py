@@ -21,7 +21,7 @@ class Config:
     PASSWORD_HASH_SALT = PASSWORD_HASH_SALT
     
     # Database configuration (Use the single DATABASE_URL)
-    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL")  # Crucial change!
+    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", 'mysql://app_user:Password1@db/project_management')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # CORS configuration
