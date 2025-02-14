@@ -31,8 +31,5 @@ USER appuser
 # Expose the application port
 EXPOSE 5000
 
-# Set environment variables for virtual environment activation (better in entrypoint.sh)
-# ENV PATH="/app/.venv/bin:$PATH"  # No longer needed here
-
 # Run entrypoint script
 ENTRYPOINT ["/app/entrypoint.sh"]
