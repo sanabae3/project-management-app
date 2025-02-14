@@ -25,7 +25,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
     # CORS configuration
-    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost")
+    CORS_ALLOWED_ORIGINS = os.getenv("CORS_ALLOWED_ORIGINS", "http://frontend,http://localhost:3000")
     
     # AWS configuration (Keep these if needed)
     AWS_REGION = os.getenv("AWS_REGION", "us-east-1")
