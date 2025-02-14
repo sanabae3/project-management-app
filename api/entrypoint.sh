@@ -2,9 +2,17 @@
 # Exit on any error
 set -e
 
-# Run database migrations
-flask db init || true
-flask db migrate -m "Initial migration" || true
+# Initialize the migrations directory if it doesn't exist
+if [ ! -d "/app/migrations" ]; then
+    flask db init
+fi
+
+# Create an initial migration if none exists
+if [ -z "$(ls -A /app/migrations/versions)" ]; then
+    flask db migrate -m "Initial migration"
+fi
+
+# Apply the migrations
 flask db upgrade
 
 # Start Flask application using the correct entry point
