@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 
 -- Insert the initial user (admin user)
 INSERT INTO users (username, email, password_hash)
-VALUES ('admin', 'admin@example.com', 'Peace123#'); -- Replace with the bcrypt hash
+VALUES ('admin', 'admin@example.com', '$2b$12$dzstnd.SoHX0ED3WvQUIGu8/BsMnD47FifeWYzioGnsho/b6sTmBO'); -- Replace with the bcrypt hash
 
 -- Or if you are not using bcrypt hash for the initial user. 
 -- INSERT INTO users (username, email, password_hash)

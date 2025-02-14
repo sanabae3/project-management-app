@@ -13,12 +13,11 @@ def login():
 
     user = User.query.filter_by(email=email).first()
 
-    if user and bcrypt.checkpw(password.encode('utf-8'), user.password_hash.encode('utf-8')): # Verify password
+    if user and bcrypt.checkpw(password.encode('utf-8'), user.password_hash.encode('utf-8')):  # ✅ Verify password correctly
         access_token = create_access_token(identity=user.id)
         return jsonify(access_token=access_token), 200
     else:
         return jsonify({"error": "Invalid login credentials."}), 401
-    
 
 # ✅ Fetch All Users
 @api_routes.route("/users", methods=["GET"])
