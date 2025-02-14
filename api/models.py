@@ -73,7 +73,7 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-       .username}>"
+       return f"<User {self.username}>"
 
 # Project Model
 class Project(db.Model):
