@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   frontend:
-    build: ./frontend  # ✅ Use correct frontend path
+    build: ./frontend
     container_name: project-management-frontend
     ports:
       - "${FRONTEND_PORT}:80"
@@ -15,7 +15,8 @@ services:
       - project_network
     restart: unless-stopped
     volumes:
-      - ./frontend/nginx.conf:/etc/nginx/nginx.conf  # ✅ Ensure NGINX uses custom config
+      - ./frontend/nginx.conf:/etc/nginx/nginx.conf  # ✅ Use custom NGINX config
+      - ./frontend:/usr/share/nginx/html  # ✅ Ensure frontend files are served
 
   api:
     build: ./api
@@ -38,6 +39,8 @@ services:
       start_period: 30s
     environment:
       DATABASE_URL: mysql+pymysql://${DATABASE_USER}:${DATABASE_PASSWORD}@database/${DATABASE_NAME}
+    volumes:
+      - ./api:/app  # ✅ Ensure API files are correctly mounted
 
   database:
     image: mysql:8.0
