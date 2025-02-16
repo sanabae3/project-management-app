@@ -1,3 +1,6 @@
+import pymysql
+pymysql.install_as_MySQLdb()  # ✅ Enforce pymysql for SQLAlchemy
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
@@ -7,17 +10,13 @@ import os
 from models import db
 from routes import api_routes
 from config import Config
-from flask_cors import CORS  # Import CORS
 
-# Load environment variables from .env
+# Load environment variables
 load_dotenv()
 
 # Initialize Flask app
 app = Flask(__name__)
 app.config.from_object(Config)
-
-# CORS Configuration (Enable CORS for all routes - adjust origins in production!)
-CORS(app)  # Or CORS(app, origins=["your-frontend-domain"]) for production
 
 # Initialize Database
 db.init_app(app)

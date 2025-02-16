@@ -1,35 +1,22 @@
-# Use Python slim image
-FROM python:3.9-slim-buster
+FROM python:3.9
 
-# Set working directory
 WORKDIR /app
 
-# Create a non-root user
-RUN groupadd -r appuser && useradd -r -g appuser appuser
-
-# Copy and install dependencies first (for better caching)
-COPY requirements.txt /app/
-RUN python3 -m venv /app/.venv && \
-    /app/.venv/bin/pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code
+# Copy project files
 COPY . /app
 
-# Run database migrations (as root, within virtual environment) - BEFORE switching user
-RUN python3 -m venv /app/.venv && \
-    . /app/.venv/bin/activate && \
-    flask db init || true && \
-    flask db migrate -m "Initial migration" || true && \
-    flask db upgrade || true
+# Create a virtual environment and activate it
+RUN python -m venv .venv
+RUN . .venv/bin/activate
 
-# Set file permissions (AFTER migrations)
-RUN chown -R appuser:appuser /app && chmod +x /app/entrypoint.sh
+# Upgrade pip
+RUN pip install --upgrade pip
 
-# Switch to non-root user
-USER appuser
+# Ensure dependencies including PyMySQL are installed
+RUN pip install -r requirements.txt
 
-# Expose the application port
+# Expose the Flask port
 EXPOSE 5000
 
-# Run entrypoint script
-ENTRYPOINT ["/app/entrypoint.sh"]
+# Set the entrypoint script
+ENTRYPOINT ["/bin/bash", "entrypoint.sh"]

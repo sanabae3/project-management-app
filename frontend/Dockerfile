@@ -1,12 +1,14 @@
 FROM nginx:latest
 
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+WORKDIR /usr/share/nginx/html
 
-COPY . /usr/share/nginx/html
+# Copy frontend files
+COPY . .
 
-RUN mkdir -p /var/cache/nginx/client_temp && \
-    chown -R appuser:appuser /var/cache/nginx /usr/share/nginx/html
+# Copy custom NGINX configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
+# Expose port 80 for serving the frontend
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
