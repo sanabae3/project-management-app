@@ -1,8 +1,5 @@
 #!/bin/bash
 set -e
 
-# Activate the virtual environment
-source /app/.venv/bin/activate
-
-# Start Flask application using Gunicorn
-exec gunicorn --bind :5000 --workers 1 --threads 4 run:app
+# Ensure logs are visible in Docker logs
+exec gunicorn --bind 0.0.0.0:5000 --workers 3 --threads 4 --access-logfile - --error-logfile - run:app

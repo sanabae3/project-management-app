@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block title %}Manage Projects{% endblock %}
+{% block content %}
+    <h2>Manage Projects</h2>
+
+    <!-- Create Project -->
+    <form id="projectForm">
+        <input type="text" id="projectName" class="form-control" placeholder="Project Name" required>
+        <textarea id="projectDescription" class="form-control" placeholder="Project Description"></textarea>
+        <button type="submit" class="btn btn-primary mt-2">Create Project</button>
+    </form>
+
+    <h3>Projects</h3>
+    <ul id="projectList" class="list-group"></ul>
+
+    <h3>Manage Tasks</h3>
+    <form id="taskForm">
+        <select id="taskProject" class="form-select"></select>
+        <input type="text" id="taskName" class="form-control" placeholder="Task Name" required>
+        <textarea id="taskDescription" class="form-control" placeholder="Task Description"></textarea>
+        <select id="taskAssignee" class="form-select"></select>
+        <button type="submit" class="btn btn-success mt-2">Create Task</button>
+    </form>
+
+    <h3>Tasks</h3>
+    <ul id="taskList" class="list-group"></ul>
+{% endblock %}

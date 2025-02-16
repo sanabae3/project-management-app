@@ -1,0 +1,15 @@
+{% extends 'layout.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+    <h2>Project Management Dashboard</h2>
+
+    <div id="loading" class="hidden">Loading data...</div>
+    
+    <h3>Your Projects</h3>
+    <ul id="userProjects" class="list-group"></ul>
+
+    <h3>Your Tasks</h3>
+    <ul id="userTasks" class="list-group"></ul>
+
+    <button onclick="logout()" class="btn btn-danger mt-3">Logout</button>
+{% endblock %}

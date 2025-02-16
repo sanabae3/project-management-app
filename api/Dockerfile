@@ -1,22 +1,17 @@
-FROM python:3.9
+# Use official Python image
+FROM python:3.10
 
+# Set working directory
 WORKDIR /app
 
 # Copy project files
 COPY . /app
 
-# Create a virtual environment and activate it
-RUN python -m venv .venv
-RUN . .venv/bin/activate
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Upgrade pip
-RUN pip install --upgrade pip
-
-# Ensure dependencies including PyMySQL are installed
-RUN pip install -r requirements.txt
-
-# Expose the Flask port
+# Expose API port
 EXPOSE 5000
 
-# Set the entrypoint script
-ENTRYPOINT ["/bin/bash", "entrypoint.sh"]
+# Set entrypoint
+ENTRYPOINT ["bash", "entrypoint.sh"]

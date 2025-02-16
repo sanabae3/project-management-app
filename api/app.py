@@ -5,6 +5,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_migrate import Migrate
+from flask_cors import CORS  # ✅ Enable CORS
 from dotenv import load_dotenv
 import os
 from models import db
@@ -18,6 +19,9 @@ load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Enable CORS for frontend communication
+CORS(app, resources={r"/api/*": {"origins": "*"}})  # ✅ Allow frontend to call API
+
 # Initialize Database
 db.init_app(app)
 
@@ -27,8 +31,8 @@ migrate = Migrate(app, db)
 # Enable JWT Authentication
 jwt = JWTManager(app)
 
-# Register API routes
-app.register_blueprint(api_routes)
+# Register API routes under /api/
+app.register_blueprint(api_routes, url_prefix="/api")  # ✅ Consistent API prefix
 
 # Run the app
 if __name__ == "__main__":

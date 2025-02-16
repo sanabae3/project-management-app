@@ -21,7 +21,7 @@ class Config:
     JWT_SECRET_KEY = JWT_SECRET_KEY
     PASSWORD_HASH_SALT = PASSWORD_HASH_SALT
     
-    # Database Configuration (Use pymysql explicitly)
+    # Database Configuration (Using PyMySQL)
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL", 'mysql+pymysql://app_user:Password1@db/project_management')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     
