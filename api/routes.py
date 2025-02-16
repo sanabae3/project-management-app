@@ -13,7 +13,7 @@ def login():
 
     user = User.query.filter_by(email=email).first()
 
-    if user and bcrypt.checkpw(password.encode('utf-8'), user.password_hash.encode('utf-8')):
+    if user and bcrypt.checkpw(password.encode("utf-8"), user.password_hash.encode("utf-8")):
         access_token = create_access_token(identity=user.id)
         return jsonify(access_token=access_token), 200
     else:
@@ -30,14 +30,19 @@ def create_project():
     data = request.json
     current_user_id = get_jwt_identity()
 
-    if not data.get("project_name"):
+    if not data.get("name"):  # ✅ Fixed field name
         return jsonify({"error": "Project name is required"}), 400
 
     try:
-        project = Project(name=data["project_name"], owner_id=current_user_id)
+        project = Project(name=data["name"], owner_id=current_user_id)  # ✅ Consistent field naming
         db.session.add(project)
         db.session.commit()
         return jsonify({"message": "Project created", "project_id": project.id}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+# ✅ Health check endpoint (Fixes API failing health check in Docker)
+@api_routes.route("/health", methods=["GET"])
+def health_check():
+    return jsonify(status="healthy"), 200
